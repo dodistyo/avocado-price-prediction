@@ -5,8 +5,11 @@ from flask import Flask
 import requests
 from flask_restplus import Api, Resource, fields
 import json
+from flask_cors import CORS
+
 
 server = Flask(__name__)
+CORS(server, resources={r"/*": {"origins": "*"}})
 api = Api(server, version='1.0', title='Pretty Cool API!', description='Awesome API')
 
 #Web Service
@@ -50,9 +53,10 @@ class Avocado(Resource):
 
         m = Prophet()
         m.fit(date_price)
-        future = m.make_future_dataframe(periods=30)
+        future = m.make_future_dataframe(periods=1)
         forecast = m.predict(future)
-        data = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']][-30:]
+        data = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']][-1:]
+        
         res = data.to_json(orient='records', date_format='iso')
         res_json = json.loads(res)
         
